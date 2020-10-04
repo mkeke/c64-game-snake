@@ -1,0 +1,87 @@
+/*
+    constants
+*/
+
+
+/*
+    macros
+*/
+
+// ypos = 0-24, xpos = 0-39
+// int values are printed one char to the right
+// strings are printed on the correct coordinate
+<movecrsr1> = poke781,>ypos:poke782,>xpos:poke783,0:sys65520
+<movecrsr2> = poke214,(>ypos-1):print:poke211,>xpos
+
+/*
+    chr$ shortcuts
+*/
+
+<chrClear> = chr$(147)
+<chrHome> = chr$(19)
+
+<chrBlack> = chr$(144)
+<chrWhite> = chr$(5)
+<chrRed> = chr$(28)
+<chrCyan> = chr$(159)
+<chrPurple> = chr$(156)
+<chrGreen> = chr$(30)
+<chrBlue> = chr$(31)
+<chrYellow> = chr$(158)
+<chrOrange> = chr$(129)
+<chrBrown> = chr$(149)
+<chrPink> = chr$(150)
+<chrDarkGrey> = chr$(151)
+<chrGrey> = chr$(152)
+<chrLightGreen> = chr$(153)
+<chrLightBlue> = chr$(154)
+<chrLightGrey> = chr$(155)
+
+// cursor movement
+<l> = chr$(157)
+<r> = chr$(29)
+<u> = chr$(145)
+<d> = chr$(17)
+
+
+/*
+    memory addresses
+*/
+
+<border> = 53280
+<screen> = 53281
+<color> = 55296
+<char> = 1024
+
+/*
+    poke colors
+*/
+
+<black> = 0
+<white> = 1
+<red> = 2
+<cyan> = 3
+<purple> = 4
+<green> = 5
+<blue> = 6
+<yellow> = 7
+<orange> = 8
+<brown> = 9
+<pink> = 10
+<darkGrey> = 11
+<grey> = 12
+<lightGreen> = 13
+<lightBlue> = 14
+<lightGrey> = 15
+
+/*
+    character codes
+    https://sta.c64.org/cbm64scr.html
+*/
+
+<space> = 32
+<heart> = 83
+<roundNW> = 85
+<roundNE> = 73
+<roundSW> = 74
+<roundSE> = 75

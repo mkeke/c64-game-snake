@@ -1,0 +1,155 @@
+@include _constants.txt
+
+<rows> = 22
+
+// clear scren with green snake color
+poke53280,0:poke53281,0:print<chrGreen><chrClear>;
+poke214,24:print:poke211,4
+print"snake! wasd to move - 2020 by sl"<chrHome>
+/*
+    create board border
+*/
+// corners
+poke1024,122:poke1063,76
+poke1024+(<rows>+1)*40,80
+poke1063+(<rows>+1)*40,79
+// horizontal
+fora=1025to1062:pokea,82:pokea+(<rows>+1)*40,69:next
+// vertical
+fora=1to<rows>:poke1024+a*40,89:poke1063+a*40,84:next
+// set board border color
+fora=0to39:poke<color>+a,9:poke<color>+(<rows>+1)*40+a,9:next
+fora=1to<rows>:poke<color>+a*40,9:poke<color>+a*40+39,9:next
+
+// head position + direction
+h = 1065: d = 1
+// tail position + direction
+t = 1065: q = 1
+// c = snake character
+gosub @setSnakeCharacter
+// growth
+g = 5
+
+gosub @placeFood
+
+@main
+
+    // move tail unless growth
+    if g=0 then gosub @moveTail
+    if g>0 then g=g-1
+
+    // move forward
+    h = h + d
+
+    // check collision
+    if peek(h)<><space> and peek(h)<><heart> then goto @gameover
+
+    // check for food. increase growth. place new food
+    if peek(h)=<heart> then g = g + 5: gosub @placeFood
+
+    // show head
+    poke h,c
+
+    // key input. multiple to slow things down
+    // TODO set correct character before changing direction
+    for a=0to3
+    get a$
+    if a$="w"then n=-40:gosub @updateHead:d=n:c=<upDown>:a=5
+    if a$="a"then n=-1:gosub @updateHead:d=n:c=<leftRight>:a=5
+    if a$="s"then n=40:gosub @updateHead:d=n:c=<upDown>:a=5
+    if a$="d"then n=1:gosub @updateHead:d=n:c=<leftRight>:a=5
+    next a
+goto @main
+
+/*
+    set new tail pos based on direction
+*/
+<upDown>=194
+<downUp>=194
+<leftRight>=195
+<rightLeft>=195
+<leftUp>=203
+<upLeft>=203
+<rightUp>=202
+<upRight>=202
+<leftDown>=201
+<downLeft>=201
+<rightDown>=213
+<downRight>=213
+
+@updateHead
+    // look at direction (d)
+    // look at next direction (n)
+    // change current head character
+    if d=1 and n=1 then poke h,<leftRight>:return
+    if d=1 and n=40 then poke h,<leftDown>:return
+    if d=1 and n=-40 then poke h,<leftUp>:return
+
+    if d=40 and n=40 then poke h,<upDown>:return
+    if d=40 and n=-1 then poke h,<upLeft>:return
+    if d=40 and n=1 then poke h,<upRight>:return
+
+    if d=-1 and n=-1 then poke h,<leftRight>:return
+    if d=-1 and n=40 then poke h,<rightDown>:return
+    if d=-1 and n=-40 then poke h,<upRight>:return
+
+    if d=-40 and n=-40 then poke h,<upDown>:return
+    if d=-40 and n=-1 then poke h,<downLeft>:return
+    if d=-40 and n=1 then poke h,<downRight>:return
+return
+
+@moveTail
+    // look at tail character
+    // find new direction of tail
+    // based on old direction and character
+
+    // get next tail character
+    >next = peek(t+q)
+    // remove current tail
+    poke t,32
+    // update tail pointer
+    t = t+q
+
+    // determine next direction of tail
+    // by looking at current direction and next character
+    if q=1 and >next=<leftRight> then q=1: return
+    if q=1 and >next=<leftUp> then q=-40: return
+    if q=1 and >next=<leftDown> then q=40: return
+
+    if q=40 and >next=<upDown> then q=40: return
+    if q=40 and >next=<leftUp> then q=-1: return
+    if q=40 and >next=<rightUp> then q=1: return
+
+    if q=-1 and >next=<leftRight> then q=-1: return
+    if q=-1 and >next=<rightUp> then q=-40: return
+    if q=-1 and >next=<rightDown> then q=40: return
+
+    if q=-40 and >next=<upDown> then q=-40: return
+    if q=-40 and >next=<leftDown> then q=-1: return
+    if q=-40 and >next=<rightDown> then q=1: return
+return
+
+/*
+*/
+@setSnakeCharacter
+    if d=1 or d=-1 then c=195: return
+    c = 194
+return
+
+/*
+    find a free spot
+*/
+@placeFood
+    f = int(rnd(0)*(<rows>+1)*40)
+    if peek(f+1024) <> 32 then goto @placeFood
+    poke f+1024,<heart>
+return
+
+/*
+    boo hoo
+*/
+@gameover
+    poke h,102
+    poke <color>-<char>+h,2
+    @gameoverloop
+        goto @gameoverloop
